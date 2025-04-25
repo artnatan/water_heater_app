@@ -7,7 +7,7 @@ A simple web app to help users quickly connect with NovaTec service. Users can r
 ### 🚀 Live Link
 **[https://service-nova.netlify.app](https://service-nova.netlify.app)**
 
-![QR Code](qr-code.png)
+![QR Code](https://raw.githubusercontent.com/artnatan/water_heater_app/main/flutter/assets/qr-code.png)
 
 ---
 
