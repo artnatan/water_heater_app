@@ -13,7 +13,9 @@ class CallbackFormScreen extends StatefulWidget {
 
 class _CallbackFormScreenState extends State<CallbackFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _phoneController = TextEditingController();
+
+  final TextEditingController _phoneController =
+      TextEditingController(text: '+380');
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _commentController = TextEditingController();
   bool _isSubmitting = false;
@@ -37,6 +39,7 @@ class _CallbackFormScreenState extends State<CallbackFormScreen> {
       if (response.statusCode == 201) {
         Navigator.pushNamed(context, '/success');
         _formKey.currentState!.reset();
+        _phoneController.text = '+380'; // сбрасываем с префиксом
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Ошибка при отправке заявки.')),
@@ -48,87 +51,60 @@ class _CallbackFormScreenState extends State<CallbackFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        backgroundColor: Colors.black,
         title: const Text('Заказать звонок'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
                 controller: _phoneController,
-                decoration: _inputDecoration('Телефон'),
+                decoration: const InputDecoration(labelText: 'Телефон'),
                 keyboardType: TextInputType.phone,
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^[+0-9]*')),
+                  FilteringTextInputFormatter.allow(RegExp(r'[+0-9]')),
                 ],
-                style: const TextStyle(color: Colors.white),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Введите номер';
-                  if (!RegExp(r'^\+?[0-9]{10,15}\$').hasMatch(value)) {
-                    return 'Неверный формат номера';
+                  if (!RegExp(r'^\+380\d{9}$').hasMatch(value)) {
+                    return 'Введите номер в формате +380XXXXXXXXX';
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
-                decoration: _inputDecoration('Имя (необязательно)'),
-                style: const TextStyle(color: Colors.white),
+                decoration:
+                    const InputDecoration(labelText: 'Имя (необязательно)'),
               ),
-              const SizedBox(height: 16),
               TextFormField(
                 controller: _commentController,
-                decoration: _inputDecoration('Комментарий (необязательно)'),
+                decoration: const InputDecoration(
+                    labelText: 'Комментарий (необязательно)'),
                 maxLines: 2,
-                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 24),
               _isSubmitting
-                  ? const Center(
-                      child: CircularProgressIndicator(color: Colors.red))
+                  ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _submitForm,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[600],
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        minimumSize: const Size.fromHeight(48),
+                        backgroundColor: Colors.red.shade700,
                       ),
                       child: const Text('Отправить заявку'),
-                    )
+                    ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  InputDecoration _inputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(color: Colors.white70),
-      enabledBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.white24),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.red),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.redAccent),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      filled: true,
-      fillColor: Colors.white12,
     );
   }
 }
